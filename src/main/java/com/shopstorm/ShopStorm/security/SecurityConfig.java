@@ -12,14 +12,21 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf().disable()
+        http
+                .csrf(csrf -> csrf.disable())  // ✅ new style
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/api/products/**", "/api/reviews/**").permitAll()
+                        .requestMatchers(
+                                "/api/auth/**",
+                                "/api/users/register",   // ✅ open for registration
+                                "/api/products/**",
+                                "/api/reviews/**"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 );
 
         return http.build();
     }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
