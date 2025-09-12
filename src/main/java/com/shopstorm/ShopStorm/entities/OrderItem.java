@@ -2,10 +2,6 @@ package com.shopstorm.ShopStorm.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
-
 
 @Entity
 @Table(name = "order_items", uniqueConstraints = {
@@ -19,8 +15,6 @@ public class OrderItem {
 
     @ManyToOne
     @JoinColumn(name = "order_id", nullable = false)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private Order order;
 
     @ManyToOne

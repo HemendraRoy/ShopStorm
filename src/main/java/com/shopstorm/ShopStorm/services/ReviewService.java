@@ -15,31 +15,32 @@ public class ReviewService {
 
     private final ReviewRepository repo;
     private final ProductRepository productRepo;
+    private final UserRepository userRepo;
 
-    public ReviewService(ReviewRepository repo, ProductRepository productRepo) {
+    public ReviewService(ReviewRepository repo, ProductRepository productRepo, UserRepository userRepo) {
         this.repo = repo;
         this.productRepo = productRepo;
+        this.userRepo = userRepo;
     }
 
-    public Review addReview(User currentUser, Long productId, int rating, String comment) {
-        Product product = productRepo.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+    public Review addReview(Long userId, Long productId, int rating, String comment) {
+        User user = userRepo.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        Product product = productRepo.findById(productId).orElseThrow(() -> new RuntimeException("Product not found"));
 
-        if (repo.findByProductAndUser(product, currentUser).isPresent()) {
-            throw new IllegalArgumentException("User has already reviewed this product");
-        }
+        if (repo.findByProductAndUser(product, user).isPresent())
+            throw new RuntimeException("User has already reviewed this product");
 
         Review review = new Review();
-        review.setUser(currentUser);
+        review.setUser(user);
         review.setProduct(product);
         review.setRating(rating);
         review.setComment(comment);
+
         return repo.save(review);
     }
 
     public List<Review> getReviewsForProduct(Long productId) {
-        Product product = productRepo.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+        Product product = productRepo.findById(productId).orElseThrow(() -> new RuntimeException("Product not found"));
         return repo.findByProduct(product);
     }
 }

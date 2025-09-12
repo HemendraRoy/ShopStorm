@@ -2,14 +2,9 @@ package com.shopstorm.ShopStorm.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
 
 @Entity
 @Table(name = "orders")
@@ -21,8 +16,6 @@ public class Order {
 
     @ManyToOne
     @JoinColumn(name = "buyer_id", nullable = false)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private User buyer;
 
     @NotNull
@@ -35,8 +28,6 @@ public class Order {
     private LocalDateTime date = LocalDateTime.now();
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private List<OrderItem> items = new ArrayList<>();
 
     public Long getId() { return id; }

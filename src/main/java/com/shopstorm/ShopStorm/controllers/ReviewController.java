@@ -1,10 +1,8 @@
 package com.shopstorm.ShopStorm.controllers;
 
 import com.shopstorm.ShopStorm.entities.Review;
-import com.shopstorm.ShopStorm.entities.User;
 import com.shopstorm.ShopStorm.services.ReviewService;
 import org.springframework.http.*;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,12 +14,12 @@ public class ReviewController {
     private final ReviewService reviewService;
     public ReviewController(ReviewService reviewService) { this.reviewService = reviewService; }
 
-    @PostMapping("/{productId}")
-    public ResponseEntity<Review> addReview(@AuthenticationPrincipal User currentUser,
+    @PostMapping("/{userId}/{productId}")
+    public ResponseEntity<Review> addReview(@PathVariable Long userId,
                                             @PathVariable Long productId,
                                             @RequestParam int rating,
                                             @RequestParam(required = false) String comment) {
-        Review review = reviewService.addReview(currentUser, productId, rating, comment);
+        Review review = reviewService.addReview(userId, productId, rating, comment);
         return ResponseEntity.status(HttpStatus.CREATED).body(review);
     }
 

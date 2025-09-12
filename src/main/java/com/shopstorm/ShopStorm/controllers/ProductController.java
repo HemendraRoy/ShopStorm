@@ -1,10 +1,8 @@
 package com.shopstorm.ShopStorm.controllers;
 
 import com.shopstorm.ShopStorm.entities.Product;
-import com.shopstorm.ShopStorm.entities.User;
 import com.shopstorm.ShopStorm.services.ProductService;
 import org.springframework.http.*;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -17,11 +15,9 @@ public class ProductController {
     private final ProductService productService;
     public ProductController(ProductService productService) { this.productService = productService; }
 
-    @PostMapping
-    public ResponseEntity<Product> addProduct(@RequestBody Product product,
-                                              @AuthenticationPrincipal User currentUser) {
-        product.setSeller(currentUser);
-        Product saved = productService.addProduct(product);
+    @PostMapping("/{sellerId}")
+    public ResponseEntity<Product> addProduct(@PathVariable Long sellerId, @RequestBody Product product) {
+        Product saved = productService.addProduct(product, sellerId);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
@@ -37,28 +33,23 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Map<String, Object>> getProductById(@PathVariable Long id) {
-        Product product = productService.getProductById(id);
+    @GetMapping("/{productId}")
+    public ResponseEntity<Map<String, Object>> getProductById(@PathVariable Long productId) {
+        Product product = productService.getProductById(productId);
         if (product == null) return ResponseEntity.notFound().build();
 
         Map<String, Object> response = new HashMap<>();
         response.put("product", product);
-        response.put("averageRating", productService.getAverageRating(id));
-
+        response.put("averageRating", productService.getAverageRating(productId));
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/{productId}")
+    @PutMapping("/{productId}/{sellerId}")
     public ResponseEntity<Product> updateProduct(@PathVariable Long productId,
-                                                 @RequestBody Product updatedProduct,
-                                                 @AuthenticationPrincipal User currentUser) {
-        Product existing = productService.getProductById(productId);
-        if (existing == null) return ResponseEntity.notFound().build();
-        if (!existing.getSeller().getId().equals(currentUser.getId())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-        Product saved = productService.updateProduct(productId, updatedProduct);
+                                                 @PathVariable Long sellerId,
+                                                 @RequestBody Product updatedProduct) {
+        Product saved = productService.updateProduct(productId, updatedProduct, sellerId);
+        if (saved == null) return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         return ResponseEntity.ok(saved);
     }
 }

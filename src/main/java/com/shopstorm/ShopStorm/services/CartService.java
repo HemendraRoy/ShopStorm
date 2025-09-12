@@ -9,7 +9,6 @@ import com.shopstorm.ShopStorm.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class CartService {
@@ -24,48 +23,33 @@ public class CartService {
         this.productRepo = productRepo;
     }
 
-    public List<CartItem> getCartForUser(User user) {
+    public List<CartItem> getCartForUser(Long userId) {
+        User user = userRepo.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         return cartRepo.findByUser(user);
     }
 
-    public CartItem addToCart(User user, Long productId, int quantity) {
-        if (quantity <= 0) throw new IllegalArgumentException("Quantity must be > 0");
+    public CartItem addToCart(Long userId, Long productId, int quantity) {
+        User user = userRepo.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        Product product = productRepo.findById(productId).orElseThrow(() -> new RuntimeException("Product not found"));
 
-        Product product = productRepo.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+        CartItem item = new CartItem();
+        item.setUser(user);
+        item.setProduct(product);
+        item.setQuantity(quantity);
 
-        if (product.getStock() < quantity) {
-            throw new IllegalArgumentException("Not enough stock for product: " + product.getName());
-        }
-
-        Optional<CartItem> existing = cartRepo.findByUserAndProduct(user, product);
-        if (existing.isPresent()) {
-            CartItem item = existing.get();
-            int newQuantity = item.getQuantity() + quantity;
-            if (product.getStock() < newQuantity) {
-                throw new IllegalArgumentException("Not enough stock to increase quantity for product: " + product.getName());
-            }
-            item.setQuantity(newQuantity);
-            return cartRepo.save(item);
-        } else {
-            CartItem item = new CartItem();
-            item.setUser(user);
-            item.setProduct(product);
-            item.setQuantity(quantity);
-            return cartRepo.save(item);
-        }
+        return cartRepo.save(item);
     }
 
-    public void removeItem(User user, Long cartItemId) {
+    public void removeItem(Long userId, Long cartItemId) {
         CartItem item = cartRepo.findById(cartItemId)
                 .orElseThrow(() -> new RuntimeException("Cart item not found"));
-        if (!item.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("Cannot remove other user's cart item");
-        }
+        if (!item.getUser().getId().equals(userId))
+            throw new RuntimeException("Cannot delete this cart item");
         cartRepo.delete(item);
     }
 
-    public void clearCart(User user) {
+    public void clearCart(Long userId) {
+        User user = userRepo.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         List<CartItem> items = cartRepo.findByUser(user);
         cartRepo.deleteAll(items);
     }

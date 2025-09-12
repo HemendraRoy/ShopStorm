@@ -2,8 +2,6 @@ package com.shopstorm.ShopStorm.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.*;
-
 import java.time.LocalDateTime;
 
 @Entity
@@ -18,14 +16,10 @@ public class CartItem {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private Product product;
 
     @NotNull

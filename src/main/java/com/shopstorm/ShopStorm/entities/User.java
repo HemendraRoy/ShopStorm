@@ -2,11 +2,7 @@ package com.shopstorm.ShopStorm.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 import java.time.LocalDateTime;
-
 
 @Entity
 @Table(name = "users")

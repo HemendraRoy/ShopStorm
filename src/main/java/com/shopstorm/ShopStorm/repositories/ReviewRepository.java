@@ -4,7 +4,6 @@ import com.shopstorm.ShopStorm.entities.Review;
 import com.shopstorm.ShopStorm.entities.Product;
 import com.shopstorm.ShopStorm.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
-
 import java.util.List;
 import java.util.Optional;
 
