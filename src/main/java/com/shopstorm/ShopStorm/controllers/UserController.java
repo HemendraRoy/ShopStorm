@@ -20,13 +20,44 @@ public class UserController {
     // Register a new user
     @PostMapping("/register")
     public ResponseEntity<Map<String, Object>> register(@RequestBody User user) {
-        User saved = userService.register(user);
-        saved.setPassword(null);
+        try {
+            User saved = userService.register(user);
+            saved.setPassword(null); // Don't return password in response
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "User registered successfully");
-        response.put("user", saved);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "User registered successfully");
+            response.put("user", saved);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (IllegalArgumentException e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+    }
+
+    // Login user
+    @PostMapping("/login")
+    public ResponseEntity<Map<String, Object>> login(@RequestBody Map<String, String> loginData) {
+        try {
+            User user = userService.login(
+                    loginData.get("email"),
+                    loginData.get("password"),
+                    loginData.get("role")
+            );
+
+            // Don't return password in response
+            user.setPassword(null);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Login successful");
+            response.put("user", user);
+            return ResponseEntity.ok(response);
+
+        } catch (RuntimeException e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Invalid credentials");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+        }
     }
 
     // Get user info by ID
@@ -45,11 +76,15 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    // Optional: Update user info
+    // Update user info
     @PutMapping("/{userId}")
     public ResponseEntity<User> updateUser(@PathVariable Long userId, @RequestBody User userDetails) {
-        User updated = userService.updateUser(userId, userDetails);
-        updated.setPassword(null);
-        return ResponseEntity.ok(updated);
+        try {
+            User updated = userService.updateUser(userId, userDetails);
+            updated.setPassword(null);
+            return ResponseEntity.ok(updated);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

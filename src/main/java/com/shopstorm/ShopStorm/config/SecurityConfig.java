@@ -1,4 +1,4 @@
-package com.shopstorm.ShopStorm.fix;
+package com.shopstorm.ShopStorm.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
