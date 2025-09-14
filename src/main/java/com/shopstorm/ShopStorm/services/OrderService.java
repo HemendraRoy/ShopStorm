@@ -84,4 +84,8 @@ public class OrderService {
         order.setOrderStatus(status);
         return orderRepo.save(order);
     }
+
+    public List<Order> getAllOrders() {
+        return orderRepo.findAll();
+    }
 }

@@ -1,13 +1,16 @@
 package com.shopstorm.ShopStorm.controllers;
 
+import com.shopstorm.ShopStorm.dtos.OrderDTO;
 import com.shopstorm.ShopStorm.entities.Order;
 import com.shopstorm.ShopStorm.entities.OrderStatus;
+import com.shopstorm.ShopStorm.mappers.OrderMapper;
 import com.shopstorm.ShopStorm.services.OrderService;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -23,9 +26,14 @@ public class OrderController {
     }
 
     @GetMapping("/buyer/{userId}")
-    public ResponseEntity<List<Order>> getUserOrders(@PathVariable Long userId) {
-        return ResponseEntity.ok(orderService.getOrdersByUser(userId));
+    public ResponseEntity<List<OrderDTO>> getUserOrders(@PathVariable Long userId) {
+        List<Order> orders = orderService.getOrdersByUser(userId);
+        List<OrderDTO> dtos = orders.stream()
+                .map(OrderMapper::toDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dtos);
     }
+
 
     @PatchMapping("/{orderId}/status")
     public ResponseEntity<Order> updateStatus(@PathVariable Long orderId,

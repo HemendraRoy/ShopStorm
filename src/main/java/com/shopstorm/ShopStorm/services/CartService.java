@@ -39,6 +39,16 @@ public class CartService {
 
         return cartRepo.save(item);
     }
+    public CartItem updateQuantity(Long userId, Long cartItemId, int quantity) {
+        CartItem item = cartRepo.findById(cartItemId)
+                .orElseThrow(() -> new RuntimeException("Cart item not found"));
+
+        if (!item.getUser().getId().equals(userId))
+            throw new RuntimeException("User does not own this cart item");
+
+        item.setQuantity(quantity);
+        return cartRepo.save(item);
+    }
 
     public void removeItem(Long userId, Long cartItemId) {
         CartItem item = cartRepo.findById(cartItemId)

@@ -84,4 +84,18 @@ public class ProductService {
         results.addAll(productRepo.findByCategoryContainingIgnoreCase(keyword));
         return new ArrayList<>(results);
     }
+
+    public boolean deleteProduct(Long productId, Long sellerId) {
+        Product existing = productRepo.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        // Verify seller owns this product
+        if (!existing.getSeller().getId().equals(sellerId)) {
+            return false; // Not allowed
+        }
+
+        productRepo.delete(existing);
+        return true;
+    }
+
 }

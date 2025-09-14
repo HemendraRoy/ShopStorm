@@ -44,4 +44,6 @@ public class Order {
 
     public OrderStatus getOrderStatus() { return status; }
     public void setOrderStatus(OrderStatus orderStatus) { this.status = orderStatus; }
+
+    public LocalDateTime getDate() { return date; }
 }

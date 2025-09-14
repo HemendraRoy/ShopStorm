@@ -65,15 +65,25 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        user.setName(userDetails.getName());
-        user.setEmail(userDetails.getEmail());
+        // Only update fields that are provided (not null)
+        if (userDetails.getName() != null) {
+            user.setName(userDetails.getName());
+        }
+
+        if (userDetails.getEmail() != null) {
+            user.setEmail(userDetails.getEmail());
+        }
 
         // Hash password if it's being updated
         if (userDetails.getPassword() != null && !userDetails.getPassword().isBlank()) {
             user.setPassword(passwordEncoder.encode(userDetails.getPassword()));
         }
 
-        user.setRole(userDetails.getRole());
+        // Only update role if it's provided
+        if (userDetails.getRole() != null) {
+            user.setRole(userDetails.getRole());
+        }
+
         return userRepository.save(user);
     }
 }
